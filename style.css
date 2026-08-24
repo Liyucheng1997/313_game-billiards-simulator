@@ -1,0 +1,246 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #14100c;
+  --panel: #221b13;
+  --panel-light: #2f261a;
+  --gold: #d4a94f;
+  --text: #e8ddc8;
+  --dim: #9a8c70;
+  --accent: #4fa3d4;
+}
+
+html, body {
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 30%, #1e1710 0%, var(--bg) 70%);
+  color: var(--text);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- HUD ---------- */
+#hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 18px;
+  gap: 12px;
+  min-height: 64px;
+}
+
+.player-panel {
+  flex: 1;
+  max-width: 340px;
+  background: linear-gradient(180deg, var(--panel-light), var(--panel));
+  border: 1px solid #3d3222;
+  border-radius: 10px;
+  padding: 6px 12px;
+  transition: box-shadow .3s, border-color .3s;
+}
+.player-panel.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 14px rgba(212, 169, 79, .35);
+}
+.player-panel.right { text-align: right; }
+.player-name { font-size: 14px; font-weight: bold; }
+.player-group { font-size: 11px; color: var(--dim); }
+.ball-tray { display: flex; gap: 3px; margin-top: 3px; min-height: 14px; }
+.player-panel.right .ball-tray { justify-content: flex-end; }
+.tray-ball {
+  width: 14px; height: 14px; border-radius: 50%;
+  font-size: 9px; line-height: 14px; text-align: center;
+  color: #fff; font-weight: bold;
+  box-shadow: inset -2px -2px 3px rgba(0,0,0,.4);
+}
+.tray-ball.done { opacity: .25; }
+
+#turn-indicator { text-align: center; flex: 0 0 auto; }
+#turn-arrow { font-size: 18px; color: var(--gold); transition: transform .3s; }
+#turn-arrow.p1 { transform: rotate(180deg); }
+#game-msg { font-size: 13px; color: var(--text); white-space: nowrap; }
+
+/* ---------- 画布 ---------- */
+#canvas-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 4px 12px;
+}
+#table { display: block; border-radius: 12px; }
+
+#toast {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 14, 8, .88);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 10px 26px;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; }
+
+/* ---------- 控制区 ---------- */
+#controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 20px 12px;
+}
+
+#spin-widget { text-align: center; }
+#spin-ball {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #cfc9bb 70%, #a8a294);
+  box-shadow: inset -4px -6px 10px rgba(0,0,0,.25), 0 2px 6px rgba(0,0,0,.5);
+  position: relative;
+  cursor: crosshair;
+  margin: 0 auto;
+}
+#spin-ball::after {
+  content: "";
+  position: absolute; inset: 46%;
+  border-radius: 50%;
+  background: rgba(0,0,0,.15);
+}
+#spin-dot {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #d43b3b;
+  border: 2px solid #fff;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+.ctl-label { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+#power-wrap { flex: 1; }
+#power-bar {
+  height: 18px;
+  border-radius: 9px;
+  background: #191410;
+  border: 1px solid #3d3222;
+  overflow: hidden;
+}
+#power-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #57c65b, #e8d44d 55%, #e05252);
+  transition: width .05s linear;
+}
+
+#btns { display: flex; gap: 8px; }
+.sm-btn {
+  background: var(--panel-light);
+  color: var(--text);
+  border: 1px solid #4a3d28;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sm-btn:hover { background: #3d3222; }
+
+/* ---------- 弹层 ---------- */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(8, 5, 3, .78);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.overlay.hidden { display: none; }
+
+.menu-card {
+  background: linear-gradient(180deg, #2b2318, #1d160e);
+  border: 1px solid #4a3d28;
+  border-radius: 18px;
+  padding: 36px 48px;
+  text-align: center;
+  max-width: 520px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.6);
+}
+.menu-card h1 { font-size: 30px; color: var(--gold); margin-bottom: 4px; }
+.menu-card h2 { font-size: 22px; color: var(--gold); margin-bottom: 14px; }
+.subtitle { color: var(--dim); font-size: 13px; margin-bottom: 22px; }
+
+.menu-section { display: flex; flex-direction: column; gap: 10px; }
+.menu-btn {
+  background: var(--panel-light);
+  color: var(--text);
+  border: 1px solid #4a3d28;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.menu-btn:hover { background: #3f3423; transform: translateY(-1px); }
+.menu-btn.primary {
+  background: linear-gradient(180deg, #e0b65e, #b8903a);
+  color: #201607;
+  font-weight: bold;
+  border-color: #e8c878;
+}
+.menu-btn.primary:hover { background: linear-gradient(180deg, #ecc470, #c79d45); }
+
+#diff-row { display: flex; gap: 8px; justify-content: center; }
+.diff-btn {
+  flex: 1;
+  background: #191410;
+  color: var(--dim);
+  border: 1px solid #3d3222;
+  border-radius: 8px;
+  padding: 7px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+.diff-btn.active {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: #2b2013;
+}
+
+.hint { margin-top: 20px; font-size: 12px; color: var(--dim); line-height: 1.7; }
+
+.help-list {
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  margin: 0 0 20px;
+  padding-left: 20px;
+}
+.help-list b { color: var(--gold); }
+kbd {
+  background: #191410;
+  border: 1px solid #4a3d28;
+  border-radius: 4px;
+  padding: 0 5px;
+  font-size: 11px;
+}
+
+#go-detail { color: var(--dim); margin-bottom: 20px; font-size: 14px; }
+#gameover .menu-btn { margin-top: 8px; width: 100%; }

@@ -49,8 +49,8 @@ class BilliardAI {
       if (!ball) continue;
       for (let pi = 0; pi < TABLE.pockets.length; pi++) {
         const p = TABLE.pockets[pi];
-        // 瞄向袋口稍内侧
-        const pdx = p.x - ball.x, pdy = p.y - ball.y;
+        // 瞄向袋口（喉部中心）
+        const pdx = p.ax - ball.x, pdy = p.ay - ball.y;
         const pdist = Math.hypot(pdx, pdy);
         if (pdist < R * 2) continue;
         const pux = pdx / pdist, puy = pdy / pdist;
@@ -67,7 +67,7 @@ class BilliardAI {
         if (cutDeg > this.cfg.maxCut) continue;
         // 路径检查
         if (this.pathBlocked(cueX, cueY, gx, gy, [0, tid])) continue;
-        if (this.pathBlocked(ball.x, ball.y, p.x, p.y, [0, tid])) continue;
+        if (this.pathBlocked(ball.x, ball.y, p.ax, p.ay, [0, tid])) continue;
         // 中袋对入射角更挑剔
         if (!p.corner) {
           const inAng = Math.abs(pux) ; // 中袋在上下边，理想入射沿 y

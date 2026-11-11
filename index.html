@@ -29,6 +29,10 @@
   <!-- 球台画布 -->
   <div id="canvas-wrap">
     <canvas id="table"></canvas>
+    <div id="pull" title="按住向下拖动拉杆蓄力，松开出杆">
+      <div id="pull-track"><div id="pull-fill"></div><div id="pull-knob"></div></div>
+      <div class="ctl-label">拉杆</div>
+    </div>
     <div id="toast"></div>
   </div>
 
@@ -42,9 +46,11 @@
     </div>
     <div id="power-wrap">
       <div id="power-bar"><div id="power-fill"></div></div>
-      <div class="ctl-label">力度 <span id="power-pct">0%</span> — 按住鼠标向后拖动蓄力，松开击球</div>
+      <div class="ctl-label">力度 <span id="power-pct">0%</span> — 左键拖动瞄准 · 右键下拉（或拖右侧拉杆 / 按住空格）蓄力，松开出杆</div>
     </div>
     <div id="btns">
+      <button id="btn-view" class="sm-btn" title="切换杆后视角 / 俯视">俯视 (V)</button>
+      <button id="btn-guide" class="sm-btn" title="显示 / 隐藏瞄准辅助线">辅助线 (G)</button>
       <button id="btn-help" class="sm-btn" title="操作说明">?</button>
       <button id="btn-menu" class="sm-btn">菜单</button>
     </div>
@@ -55,7 +61,7 @@
 <div id="menu" class="overlay">
   <div class="menu-card">
     <h1>🎱 台球模拟器</h1>
-    <p class="subtitle">中式八球 · 真实物理引擎</p>
+    <p class="subtitle">中式八球 · 3D 实景 · 真实物理</p>
     <div class="menu-section">
       <button class="menu-btn primary" data-mode="ai">单人 · 挑战 AI</button>
       <div id="diff-row">
@@ -66,7 +72,7 @@
       <button class="menu-btn" data-mode="pvp">双人 · 同屏对战</button>
       <button class="menu-btn" data-mode="free">练习 · 自由击球</button>
     </div>
-    <p class="hint">瞄准：移动鼠标 · 微调：← → 方向键 · 击球：按住拖动蓄力后松开</p>
+    <p class="hint">瞄准：左键拖动（← → 微调） · 出杆：右键下拉蓄力后松开 · 滚轮远近 · V 切换俯视</p>
   </div>
 </div>
 
@@ -75,11 +81,12 @@
   <div class="menu-card">
     <h2>操作说明</h2>
     <ul class="help-list">
-      <li><b>瞄准</b>：移动鼠标，白球会朝鼠标方向瞄准；按 <kbd>←</kbd> <kbd>→</kbd> 精细微调（按住 <kbd>Shift</kbd> 更细）。</li>
-      <li><b>击球</b>：在球台上按住左键，向瞄准反方向拖动蓄力，松开出杆。</li>
-      <li><b>加塞 / 高低杆</b>：点击左下角的白球图标设置击球点。上=跟进（高杆），下=缩杆（低杆），左右=侧旋（加塞）。</li>
-      <li><b>自由球</b>：对方犯规后，直接拖动白球到任意位置摆放。</li>
-      <li><b>规则</b>：中式八球。开球后首次合法进球确定花色（全色/花色），清完本方球后打进黑8获胜；白球落袋、误击对方球为犯规，对手获自由球；提前打进黑8直接判负。</li>
+      <li><b>瞄准</b>：按住左键左右拖动转动瞄准线（按住 <kbd>Shift</kbd> 精细微调），上下拖动调整视角高低；<kbd>←</kbd> <kbd>→</kbd> 微调，滚轮拉近拉远。</li>
+      <li><b>出杆</b>：按住右键向下拉（或拖动右侧“拉杆”、按住 <kbd>空格</kbd>）把球杆向后拉，拉得越远力越大，松开出杆。</li>
+      <li><b>视角</b>：<kbd>V</kbd> 在杆后视角与俯视之间切换；俯视下按住左键指向哪里就瞄哪里。<kbd>G</kbd> 开关辅助线。</li>
+      <li><b>加塞 / 高低杆</b>：点击左下角白球设置击球点。上=高杆（跟进），下=低杆（缩杆），左右=加塞；球杆会真的移到那个击球点。双击复位。</li>
+      <li><b>自由球</b>：对方犯规后，在台面上点击放置白球。</li>
+      <li><b>规则</b>：中式八球。开球后首次合法进球确定花色，清完本方球后打进黑8获胜；白球落袋、误击对方球为犯规，对手获自由球；提前打进黑8直接判负。</li>
     </ul>
     <button class="menu-btn primary" id="btn-close-help">知道了</button>
   </div>
@@ -95,11 +102,12 @@
   </div>
 </div>
 
+<script src="vendor/three.min.js"></script>
 <script src="js/table.js"></script>
 <script src="js/physics.js"></script>
 <script src="js/rules.js"></script>
 <script src="js/ai.js"></script>
-<script src="js/render.js"></script>
+<script src="js/render3d.js"></script>
 <script src="js/sound.js"></script>
 <script src="js/main.js"></script>
 </body>
